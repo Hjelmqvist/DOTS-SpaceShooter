@@ -22,7 +22,10 @@ public partial class DestroyOutOfBoundsSystem : SystemBase
 
         Entities.ForEach((Entity entity, in Translation translation) => 
         {
-            if (translation.Value.x < -cameraBounds.x - OutOfBoundsPadding)
+            float x = translation.Value.x;
+            float y = translation.Value.y;
+            if (x < -cameraBounds.x - OutOfBoundsPadding || x > cameraBounds.x + OutOfBoundsPadding ||
+                y < -cameraBounds.y - OutOfBoundsPadding || y > cameraBounds.y + OutOfBoundsPadding)
             {
                 buffer.DestroyEntity(entity);
             }
