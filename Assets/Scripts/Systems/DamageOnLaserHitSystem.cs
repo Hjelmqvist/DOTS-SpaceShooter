@@ -28,23 +28,20 @@ public partial class DamageOnLaserHitSystem : SystemBase
             Entity entityA = triggerEvent.EntityA;
             Entity entityB = triggerEvent.EntityB;
 
-            bool aHealth = HealthGroup.HasComponent(entityA);
-            bool bHealth = HealthGroup.HasComponent(entityB);
+            Health health;
+            Laser laser;
 
-            bool aLaser = LaserGroup.HasComponent(entityA);
-            bool bLaser = LaserGroup.HasComponent(entityB);
-
-
-            // Should actually get Health and decrease Value by 1 but it wont work and I'm sick
-            if (aHealth && bLaser)
+            if (HealthGroup.TryGetComponent(entityA, out health) && LaserGroup.TryGetComponent(entityB, out laser))
             {
-                Buffer.DestroyEntity(entityA);
+                health.Value -= 1;
+                Buffer.SetComponent(entityA, health);
                 Buffer.DestroyEntity(entityB);
             }
-            else if (bHealth && aLaser)
+            else if (HealthGroup.TryGetComponent(entityB, out health) && LaserGroup.TryGetComponent(entityA, out laser))
             {
+                health.Value -= 1;
+                Buffer.SetComponent(entityB, health);
                 Buffer.DestroyEntity(entityA);
-                Buffer.DestroyEntity(entityB);
             }
         }
     }
