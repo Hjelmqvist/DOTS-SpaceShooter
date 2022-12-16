@@ -5,4 +5,6 @@ using Unity.Entities;
 public struct Laser : IComponentData
 {
     public float MoveSpeed;
+    public float MaxAge;
+    public float Age;
 }
