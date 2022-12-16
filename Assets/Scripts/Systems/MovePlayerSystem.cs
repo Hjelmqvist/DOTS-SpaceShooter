@@ -6,22 +6,34 @@ using UnityEngine;
 
 public partial class MovePlayerSystem : SystemBase
 {
-    const float CameraBoundsPadding = 0.3f;
+    const float BoundsXPadding = 0.3f;
+    const float BoundsYPadding = 0.5f;
 
     protected override void OnUpdate()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
-        float3 direction = new float3(horizontal, 0, 0);
+        float vertical = Input.GetAxisRaw("Vertical");
+
+        if (horizontal == 0 && vertical == 0)
+            return;
+
+        float3 direction = new float3(horizontal, vertical, 0);
+        direction = math.normalize(direction);
+
         float deltaTime = Time.DeltaTime;
 
         Vector3 cameraBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
         Debug.Log(cameraBounds);
 
-        Entities.ForEach((ref Translation translation, in PlayerShip ship) =>
+        Entities
+            .WithAll<PlayerTag>()
+            .ForEach((ref Translation translation, in Ship ship) =>
         {
-            float x = translation.Value.x + horizontal * ship.MovementSpeed * deltaTime;
-            x = Mathf.Clamp(x, -cameraBounds.x + CameraBoundsPadding, cameraBounds.x - CameraBoundsPadding);
-            translation.Value.x = x;
+            direction *= ship.MoveSpeed * deltaTime;
+            float3 newPosition = translation.Value + direction;
+            newPosition.x = Mathf.Clamp(newPosition.x, -cameraBounds.x + BoundsXPadding, cameraBounds.x - BoundsXPadding);
+            newPosition.y = Mathf.Clamp(newPosition.y, -cameraBounds.y + BoundsYPadding, cameraBounds.y - BoundsYPadding);
+            translation.Value = newPosition;
         }).Run();
     }
 }
